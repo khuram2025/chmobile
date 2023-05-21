@@ -5,6 +5,32 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'components/side_menu.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+Future<void> login(String mobileNumber, String password) async {
+  final response = await http.post(
+    Uri.parse('http://192.168.8.153:8000/api/login/'),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(<String, String>{
+      'mobile_number': mobileNumber,
+      'password': password,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    // If the server returns a 200 OK response,
+    // then parse the JSON.
+    print('Login successful');
+    print('Response body: ${response.body}');
+  } else {
+    // If the server did not return a 200 OK response,
+    // then throw an exception.
+    print('Failed to login. Status code: ${response.statusCode}');
+  }
+}
 
 class MainScreen extends StatelessWidget {
   @override

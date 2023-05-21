@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+import 'login.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -22,14 +24,18 @@ class MyApp extends StatelessWidget {
             .apply(bodyColor: Colors.white),
         canvasColor: secondaryColor,
       ),
-      home: MultiProvider(
-        providers: [
-          ChangeNotifierProvider(
-            create: (context) => MenuAppController(),
-          ),
-        ],
-        child: MainScreen(),
-      ),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => MultiProvider(
+          providers: [
+            ChangeNotifierProvider(
+              create: (context) => MenuAppController(),
+            ),
+          ],
+          child: MainScreen(),
+        ),
+        '/login': (context) => LoginPage(),
+      },
     );
   }
 }
