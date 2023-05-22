@@ -6,7 +6,7 @@ class LoginPage extends StatelessWidget {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  Future<void> login(String mobileNumber, String password) async {
+  Future<void> login(String mobileNumber, String password, BuildContext context) async {
     final response = await http.post(
       Uri.parse('http://farmapp.channab.com:8000/accounts/api/login/'),
       headers: <String, String>{
@@ -23,6 +23,11 @@ class LoginPage extends StatelessWidget {
       // then parse the JSON.
       print('Login successful');
       print('Response body: ${response.body}');
+
+      // Switch to the home page
+      Navigator.pushNamed(context, '/home');
+    } else if (response.statusCode == 401) {
+      print('Invalid credentials.');
     } else {
       // If the server did not return a 200 OK response,
       // then throw an exception.
@@ -39,16 +44,16 @@ class LoginPage extends StatelessWidget {
       body: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           if (constraints.maxWidth < 600) {
-            return _buildMobileLayout();
+            return _buildMobileLayout(context);
           } else {
-            return _buildTabletLayout();
+            return _buildTabletLayout(context);
           }
         },
       ),
     );
   }
 
-  Widget _buildMobileLayout() {
+  Widget _buildMobileLayout(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -74,7 +79,7 @@ class LoginPage extends StatelessWidget {
           SizedBox(height: 20),
           ElevatedButton(
             onPressed: () {
-              login(_phoneController.text, _passwordController.text);
+              login(_phoneController.text, _passwordController.text, context);
             },
             child: Text('Login'),
           ),
@@ -95,7 +100,7 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTabletLayout() {
+  Widget _buildTabletLayout(BuildContext context) {
     return Center(
       child: Container(
         width: 400,
@@ -123,7 +128,7 @@ class LoginPage extends StatelessWidget {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                login(_phoneController.text, _passwordController.text);
+                login(_phoneController.text, _passwordController.text, context);
               },
               child: Text('Login'),
             ),
