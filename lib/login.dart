@@ -8,7 +8,7 @@ class LoginPage extends StatelessWidget {
 
   Future<void> login(String mobileNumber, String password) async {
     final response = await http.post(
-      Uri.parse('http://192.168.8.153:8000/accounts/api/login/'),
+      Uri.parse('http://farmapp.channab.com:8000/accounts/api/login/'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
