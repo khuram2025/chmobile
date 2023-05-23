@@ -2,38 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'controllers/api_service.dart';
+
 class LoginPage extends StatelessWidget {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final ApiService _apiService = ApiService();
 
-  Future<void> login(String mobileNumber, String password, BuildContext context) async {
-    final response = await http.post(
-      Uri.parse('http://farmapp.channab.com:8000/accounts/api/login/'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'mobile_number': mobileNumber,
-        'password': password,
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      // If the server returns a 200 OK response,
-      // then parse the JSON.
-      print('Login successful');
-      print('Response body: ${response.body}');
-
-      // Switch to the home page
-      Navigator.pushNamed(context, '/home');
-    } else if (response.statusCode == 401) {
-      print('Invalid credentials.');
-    } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      print('Failed to login. Status code: ${response.statusCode}');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,11 +53,20 @@ class LoginPage extends StatelessWidget {
           ),
           SizedBox(height: 20),
           ElevatedButton(
-            onPressed: () {
-              login(_phoneController.text, _passwordController.text, context);
+            onPressed: () async {
+              final response = await _apiService.login(_phoneController.text, _passwordController.text);
+              if (response == null) {
+                // if the login is successful, navigate to home page
+                Navigator.pushReplacementNamed(context, '/home');
+              } else {
+                // show error message
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(SnackBar(content: Text(response)));
+              }
             },
             child: Text('Login'),
           ),
+
           TextButton(
             onPressed: () {
               // Add your forgot password logic here.
@@ -127,11 +111,20 @@ class LoginPage extends StatelessWidget {
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                login(_phoneController.text, _passwordController.text, context);
+              onPressed: () async {
+                final response = await _apiService.login(_phoneController.text, _passwordController.text);
+                if (response == null) {
+                  // if the login is successful, navigate to home page
+                  Navigator.pushReplacementNamed(context, '/home');
+                } else {
+                  // show error message
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text(response)));
+                }
               },
               child: Text('Login'),
             ),
+
             TextButton(
               onPressed: () {
                 // Add your forgot password logic here.

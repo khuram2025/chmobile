@@ -6,8 +6,29 @@ import 'screens/dashboard/components/header.dart';
 import 'screens/dashboard/components/my_files.dart';
 import 'screens/main/components/side_menu.dart';
 import 'package:provider/provider.dart';
+import 'controllers/api_service.dart';
+import 'models/animal_list.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
-class HomePage extends StatelessWidget {
+
+class HomePage extends StatefulWidget {
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  late Future<List<Property>> futureProperties;
+  ApiService apiService = ApiService();
+
+
+  @override
+  void initState() {
+    super.initState();
+    futureProperties = apiService.getHomeData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,17 +38,24 @@ class HomePage extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // We want this side menu only for large screen
             if (Responsive.isDesktop(context))
               Expanded(
-                // default flex = 1
-                // and it takes 1/6 part of the screen
                 child: SideMenu(),
               ),
             Expanded(
-              // It takes 5/6 part of the screen
               flex: 5,
-              child: HomePageBody(),
+              child: FutureBuilder<List<Property>>(
+                future: futureProperties,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else {
+                    return HomePageBody(properties: snapshot.data!);
+                  }
+                },
+              ),
             ),
           ],
         ),
@@ -37,6 +65,10 @@ class HomePage extends StatelessWidget {
 }
 
 class HomePageBody extends StatelessWidget {
+  final List<Property> properties;
+
+  HomePageBody({required this.properties});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,6 +79,8 @@ class HomePageBody extends StatelessWidget {
             children: [
               Header(),
               SizedBox(height: defaultPadding),
+
+
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -56,7 +90,10 @@ class HomePageBody extends StatelessWidget {
                       children: [
                         MyFiles(),
                         SizedBox(height: defaultPadding),
-                        Text("Animal List Card "),
+                        Column(
+                          children: properties.map((property) => PropertyCard(property: property)).toList(),
+                        ),
+                        SizedBox(height: defaultPadding),
                         if (Responsive.isMobile(context))
                           SizedBox(height: defaultPadding),
                         if (Responsive.isMobile(context)) Text("Storage Files will be here"),
@@ -76,6 +113,97 @@ class HomePageBody extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class PropertyCard extends StatelessWidget {
+  final Property property;
+
+  PropertyCard({required this.property});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 150,
+      child: Stack(
+        children: [
+          Card(
+            child: Row(
+              children: <Widget>[
+                Stack(
+                  children: [
+                    Container(
+                      width: 150,
+                      height: 150,
+                      child: Image.network(
+                        property.imageUrl,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ],
+                ),
+                Container(
+                  width: 262,
+                  height: 150,
+                  padding: EdgeInsets.all(8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        property.tag,
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        property.dob,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        property.purchaseCost.toString(),
+                        style: TextStyle(color: Colors.green),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Spacer(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Badge(property.sex),
+                          Badge(property.status),
+                          Badge(property.animalType),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // ... rest of the code
+        ],
+      ),
+    );
+  }
+
+  Widget Badge(String label) {
+    return Container(
+      width: 77.91,
+      height: 26,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.white),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(color: Colors.white),
       ),
     );
   }
