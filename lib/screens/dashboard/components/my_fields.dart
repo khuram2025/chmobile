@@ -1,4 +1,5 @@
 import 'package:admin/models/MyFiles.dart';
+import 'package:admin/models/animal_list.dart';
 import 'package:admin/responsive.dart';
 import 'package:flutter/material.dart';
 
@@ -74,7 +75,7 @@ class FileInfoCardGridView extends StatelessWidget {
         mainAxisSpacing: defaultPadding,
         childAspectRatio: childAspectRatio,
       ),
-      itemBuilder: (context, index) => FileInfoCard(info: demoMyFiles[index]),
+      itemBuilder: (context, index) => FileInfoCard(info: HomeAPI[index]),
     );
   }
 }

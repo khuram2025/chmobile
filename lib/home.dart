@@ -19,14 +19,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late Future<List<Property>> futureProperties;
+  late Future<HomeAPI> futureHomeData;
   ApiService apiService = ApiService();
 
 
   @override
   void initState() {
     super.initState();
-    futureProperties = apiService.getHomeData();
+    futureHomeData = apiService.getHomeData();
+
   }
 
   @override
@@ -44,18 +45,24 @@ class _HomePageState extends State<HomePage> {
               ),
             Expanded(
               flex: 5,
-              child: FutureBuilder<List<Property>>(
-                future: futureProperties,
+              child: FutureBuilder<HomeAPI>(
+                future: futureHomeData,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else {
-                    return HomePageBody(properties: snapshot.data!);
+                    HomeAPI homeData = snapshot.data!;
+                    // You can now access maleAnimals, femaleAnimals, and animals
+                    // from homeData and do whatever you need to do with them.
+                    // For example, you might want to create a list that combines all three.
+                    List<Property> allProperties = homeData.maleAnimals + homeData.femaleAnimals + homeData.animals;
+                    return HomePageBody(properties: allProperties);
                   }
                 },
               ),
+
             ),
           ],
         ),
@@ -71,48 +78,42 @@ class HomePageBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.all(defaultPadding),
-          child: Column(
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(defaultPadding),
+      child: Column(
+        children: [
+          Header(),
+          SizedBox(height: defaultPadding),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Header(),
-              SizedBox(height: defaultPadding),
-
-
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    flex: 5,
-                    child: Column(
-                      children: [
-                        MyFiles(),
-                        SizedBox(height: defaultPadding),
-                        Column(
-                          children: properties.map((property) => PropertyCard(property: property)).toList(),
-                        ),
-                        SizedBox(height: defaultPadding),
-                        if (Responsive.isMobile(context))
-                          SizedBox(height: defaultPadding),
-                        if (Responsive.isMobile(context)) Text("Storage Files will be here"),
-                      ],
+              Expanded(
+                flex: 5,
+                child: Column(
+                  children: [
+                    MyFiles(),
+                    SizedBox(height: defaultPadding),
+                    Column(
+                      children: properties.map((property) => PropertyCard(property: property)).toList(),
                     ),
-                  ),
-                  if (!Responsive.isMobile(context))
-                    SizedBox(width: defaultPadding),
-                  // On Mobile means if the screen is less than 850 we don't want to show it
-                  if (!Responsive.isMobile(context))
-                    Expanded(
-                      flex: 2,
-                      child: Text("Storage Files will be here"),
-                    ),
-                ],
-              )
+                    SizedBox(height: defaultPadding),
+                    if (Responsive.isMobile(context))
+                      SizedBox(height: defaultPadding),
+                    if (Responsive.isMobile(context)) Text("Storage Files will be here"),
+                  ],
+                ),
+              ),
+              if (!Responsive.isMobile(context))
+                SizedBox(width: defaultPadding),
+              // On Mobile means if the screen is less than 850 we don't want to show it
+              if (!Responsive.isMobile(context))
+                Expanded(
+                  flex: 2,
+                  child: Text("Storage Files will be here"),
+                ),
             ],
-          ),
-        ),
+          )
+        ],
       ),
     );
   }
@@ -125,6 +126,7 @@ class PropertyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String baseUrl = 'http://farmapp.channab.com:8000/media/';
     return Container(
       height: 150,
       child: Stack(
@@ -137,10 +139,10 @@ class PropertyCard extends StatelessWidget {
                     Container(
                       width: 150,
                       height: 150,
-                      child: Image.network(
-                        property.imageUrl,
-                        fit: BoxFit.cover,
-                      ),
+
+                      child: Image.network(baseUrl + property.imageUrl, fit: BoxFit.fill,),
+
+
                     ),
                   ],
                 ),

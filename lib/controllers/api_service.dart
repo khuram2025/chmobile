@@ -32,7 +32,7 @@ class ApiService {
     }
   }
 
-  Future<List<Property>> getHomeData() async {
+  Future<HomeAPI> getHomeData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
 
@@ -49,28 +49,14 @@ class ApiService {
     );
     print(response.body);
 
-
     if (response.statusCode == 200) {
       Map<String, dynamic> map = json.decode(response.body);
 
-      Iterable maleAnimals = map['male_animals'] as List;
-      Iterable femaleAnimals = map['female_animals'] as List;
-      Iterable animals = map['animals'] as List;
+      HomeAPI homeAPI = HomeAPI.fromJson(map);
 
-      // Now you can convert these lists to your desired type
-      List<Property> maleAnimalProperties = maleAnimals.map((model) => Property.fromJson(model)).toList();
-      List<Property> femaleAnimalProperties = femaleAnimals.map((model) => Property.fromJson(model)).toList();
-      List<Property> animalProperties = animals.map((model) => Property.fromJson(model)).toList();
-
-      // combine all lists into one
-      List<Property> allProperties = [];
-      allProperties.addAll(maleAnimalProperties);
-      allProperties.addAll(femaleAnimalProperties);
-      allProperties.addAll(animalProperties);
-
-      return allProperties;
+      return homeAPI;
     } else {
-      throw Exception('Failed to load properties');
+      throw Exception('Failed to load home data');
     }
   }
 }
