@@ -75,7 +75,7 @@ class ApiService {
     }
   }
 
-  Future<List<Income>> getIncomeList() async {
+  Future<List<Income>> getIncomeList(String timeFilter) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
 
@@ -84,7 +84,7 @@ class ApiService {
     }
 
     final response = await http.get(
-      Uri.parse('$_baseUrl/erp/api_income_list/'),  // Adjust this URL to match your Django API
+      Uri.parse('$_baseUrl/erp/api_income_list/?time_filter=$timeFilter'), // Add time filter to the API URL
       headers: <String, String>{
         'Authorization': 'Token $token',
         'Content-Type': 'application/json; charset=UTF-8',

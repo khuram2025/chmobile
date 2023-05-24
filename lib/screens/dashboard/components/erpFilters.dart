@@ -24,9 +24,9 @@ class ERPFilter extends StatelessWidget {
             "Dashboard",
             style: Theme.of(context).textTheme.titleLarge,
           ),
-        if (!Responsive.isMobile(context))
-          Spacer(flex: Responsive.isDesktop(context) ? 2 : 1),
-        Expanded(child: ERPFilter()),
+        Spacer(), // This will occupy all remaining space.
+        WebFilter(),
+        SizedBox(width: defaultPadding,),
         ElevatedButton(onPressed: (){}, child: Text('ADD'))
       ],
     );
