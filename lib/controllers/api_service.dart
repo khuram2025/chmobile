@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/animal_list.dart';
+import '../models/incomelistModel.dart';
 
 class ApiService {
   static const String _baseUrl = 'http://farmapp.channab.com:8000/';
@@ -73,4 +74,30 @@ class ApiService {
       throw Exception('Failed to load properties');
     }
   }
+
+  Future<List<Income>> getIncomeList() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token == null) {
+      throw Exception('Token is null');
+    }
+
+    final response = await http.get(
+      Uri.parse('$_baseUrl/erp/api_income_list/'),  // Adjust this URL to match your Django API
+      headers: <String, String>{
+        'Authorization': 'Token $token',
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      Iterable incomes = json.decode(response.body) as List;
+      List<Income> incomeList = incomes.map((model) => Income.fromJson(model)).toList();
+      return incomeList;
+    } else {
+      throw Exception('Failed to load incomes');
+    }
+  }
+
 }

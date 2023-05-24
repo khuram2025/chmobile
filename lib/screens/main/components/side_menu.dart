@@ -20,32 +20,32 @@ class SideMenu extends StatelessWidget {
             press: () {Navigator.pushNamed(context, '/home');},
           ),
           DrawerListTile(
-            title: "Transaction",
+            title: "AnimalList",
             svgSrc: "assets/icons/menu_tran.svg",
-            press: () {},
+            press: () {Navigator.pushNamed(context, '/animallist');},
           ),
           DrawerListTile(
-            title: "Task",
+            title: "Income",
             svgSrc: "assets/icons/menu_task.svg",
-            press: () {},
+            press: () {Navigator.pushNamed(context, '/income');},
           ),
           DrawerListTile(
-            title: "Documents",
+            title: "Expense",
             svgSrc: "assets/icons/menu_doc.svg",
-            press: () {},
+            press: () {Navigator.pushNamed(context, '/expense');},
           ),
           DrawerListTile(
-            title: "Store",
+            title: "Employess",
             svgSrc: "assets/icons/menu_store.svg",
-            press: () {},
-          ),
-          DrawerListTile(
-            title: "Notification",
-            svgSrc: "assets/icons/menu_notification.svg",
-            press: () {},
+            press: () {Navigator.pushNamed(context, '/employees');},
           ),
           DrawerListTile(
             title: "Profile",
+            svgSrc: "assets/icons/menu_profile.svg",
+            press: () {Navigator.pushNamed(context, '/profile');},
+          ),
+          DrawerListTile(
+            title: "Login",
             svgSrc: "assets/icons/menu_profile.svg",
             press: () {
               Navigator.pushNamed(context, '/login');
